@@ -1,0 +1,58 @@
+package newtest;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.LinkedList;
+import java.util.List;
+
+public class NewTest {
+
+	public static void main(String[] args) {
+		// TODO 自动生成的方法存根
+		 File file = new File("D:\\softwareprotect\\yq_in.txt");
+	        FileReader fr = null;
+	        FileWriter fw = null;
+	        try {
+	            fr = new FileReader(file);
+	            char[] data = new char[1500];
+	            int length = 0;
+	            String str = null;
+	            while ((length = fr.read(data)) > 0) {
+	                str = new String(data, 0, length);
+	            }
+	            String[] splitLine = str.split("\n");
+	            List<String> newLine = new LinkedList<>();
+	            for(int i = 0; i < splitLine.length - 1; i++){
+	                String province = splitLine[i].substring(0,3);
+	                String nextProvince = splitLine[i+1].substring(0,3);
+	                if(i == 0) newLine.add(province);
+	                newLine.add(splitLine[i].substring(splitLine[i].indexOf("\t") + 1,splitLine[i].length()));
+	                if( province.equals(nextProvince) == false){
+	                    newLine.add("\n");
+	                    newLine.add(nextProvince);
+	                }
+	            }
+	            StringBuilder sb = new StringBuilder();
+	            for(int i = 0; i < newLine.size();i++){
+	                sb.append(newLine.get(i));
+	                if(newLine.get(i).equals("\n") == false) {
+	                    sb.append("\n");
+	                }
+	            }
+	            String s = sb.toString();
+	            fw = new FileWriter("D:\\softwareprotect\\yq_out.txt");
+	            fw.write(s);
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        } finally {
+	            try {
+	                fr.close();
+	                fw.close();
+	            } catch (Exception e) {
+	                e.printStackTrace();
+	            }
+	        }
+	}
+
+}
