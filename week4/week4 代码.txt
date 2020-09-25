@@ -1,0 +1,270 @@
+package newtest;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.text.Collator;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.jar.JarOutputStream;
+
+import javax.swing.JOptionPane;
+
+public class NewTest {
+//    private final static Comparator<Object> CHINA_COMPARE = Collator.getInstance(java.util.Locale.CHINA);
+
+
+
+	public static void main(String[] args) {
+		// TODO 自动生成的方法存根
+	//	String path1 = JOptionPane.showInputDialog(null,"请输入路径");
+	//	 File file = new File(path1);
+		Scanner in = new Scanner(System.in);
+    	String input = in.nextLine();
+    	String[] splitLine1 = input.split(" ");//输入一行，空格分割
+    	String yq_in  = splitLine1[0];
+    	String yq_out = splitLine1[1];
+    	File file = new File("D://softwareprotect//" + yq_in + ".txt");
+        FileReader fr = null;
+        FileWriter fw = null;
+        int flag = 0;
+        String name = "";
+    	if(splitLine1.length == 3) //判断是否输入第三个数据
+    	{
+    		name = splitLine1[2];//市名市splitLine1[2]
+    		flag = 1;
+    	}
+    	try {
+    		fr = new FileReader(file);//读文件
+    		char[] data = new char[10000];//初始化字符
+	        int length = 0;//长度初始化为0
+	        String str = null;//初始化字符串为空
+	        while ((length = fr.read(data)) > 0) {
+	           str = new String(data, 0, length);//str字符串长度是data的长度，内容是data，从0开始
+	        }
+	        String[] splitLine = str.split("\r\n|\t");//换行分割str字符串
+	        
+	        if(flag == 0)   //没有第三个数据的情况
+	        {
+	        	ChangeClass[] changeclass = new ChangeClass[30];
+		        //List<String> newLine = new LinkedList<>();//Java代码将文件的读取至到StringList中，再将List内容转化成源文件，链表
+		        for(int i = 0; i < changeclass.length ; i++)//输入的长度
+		        {
+		        	changeclass[i] = new ChangeClass();
+		        	
+//		        	String province = splitLine[i].substring(0,3);//从0开始，分割成3分（省份）
+//		            String nextProvince = splitLine[i+1].substring(0,3);//下一个省份
+//		            if(i == 0) {
+//		            	newLine.add(province);
+//		                        
+//		                      
+//		                        }//源文件添加省份
+//		             newLine.add(splitLine[i].substring(splitLine[i].indexOf("\t") + 1,splitLine[i].length()));
+//		             Collections.sort(newLine, CHINA_COMPARE);
+//		             if( province.equals(nextProvince) == false)//两个省份比较，不一样就添加下一个省份
+//		            	{
+//		            	newLine.add("\n");
+//		                newLine.add(nextProvince);
+//		                }
+//		             Collections.sort(newLine, CHINA_COMPARE);
+		            }
+		        int mark_tmp =0;
+		        int index =0;
+		        int city_tmp = 0;
+		        boolean bool_index = true;
+		        for(int i=0;i<splitLine.length;i++) {
+		        	String province = splitLine[3*i];
+		            String nextProvince = splitLine[3*(i+1)];
+		            changeclass[index].city.add(splitLine[3*i+1]);
+		            changeclass[index].mark.add(splitLine[3*i+2]);
+		            city_tmp++;
+		            mark_tmp += Integer.parseInt(splitLine[3*i+2]);
+		            if(province.equals(nextProvince) == false){
+		            	changeclass[index].province = splitLine[3*i];
+		            	changeclass[index].total_city = city_tmp;
+		            	changeclass[index].total_mark = mark_tmp;
+		            	index++;
+		            	mark_tmp = 0;
+		            	city_tmp = 0;
+		        	
+		        	
+		        }
+		            if(i == splitLine.length/3-2) {
+		            	if(province.equals(nextProvince) == false) {
+		            		bool_index = true;
+		            		changeclass[index].province =splitLine[3*(i+1)];
+		            		changeclass[index].total_city = 1;
+			            	changeclass[index].total_mark = Integer.parseInt(splitLine[3*(i+1)+2]);
+			            	changeclass[index].city.add(splitLine[3*(i+1)+1]);
+				            changeclass[index].mark.add(splitLine[3*(i+1)+2]);
+		            	}
+		            	else {
+		            		bool_index = false;
+		            		changeclass[index-1].total_city += 1;
+			            	changeclass[index-1].total_mark += Integer.parseInt(splitLine[3*(i+1)+2]);
+			            	changeclass[index-1].city.add(splitLine[3*(i+1)+1]);
+				            changeclass[index-1].mark.add(splitLine[3*(i+1)+2]);
+		            	}	     
+	              }
+//		            StringBuilder sb = new StringBuilder();
+//			        for(int i = 0; i < newLine.size();i++){
+//			        	sb.append(newLine.get(i));
+//			            if(newLine.get(i).equals("\n") == false) {
+//			            	sb.append("\n");
+//			            	}
+//			            }
+//			        String s = sb.toString();
+//			        fw = new FileWriter("D://softwareprotect//" + yq_out +".txt");
+//			        fw.write(s);
+		        }
+		        if(bool_index == false) 
+		        	index--;  
+		        for(int i = 0; i <= index; i++) {
+		        	for(int j = 0; j <= index-i-1; j++) {
+		        		if(changeclass[j].total_mark < changeclass[j+1].total_mark) {
+		        			ChangeClass tmp = new ChangeClass();
+		        			tmp = changeclass[j];
+		        			changeclass[j] = changeclass[j+1];
+		        			changeclass[j+1] = tmp;
+		        		}
+		        		if(changeclass[j].total_mark == changeclass[j+1].total_mark) {
+		        			if(changeclass[j].province.compareTo(changeclass[j+1].province) > 0) {
+		        				ChangeClass tmp = new ChangeClass();
+			        			tmp = changeclass[j];
+			        			changeclass[j] = changeclass[j+1];
+			        			changeclass[j+1] = tmp;
+		        			}
+		        		}
+		        		
+		        	}
+		        }
+		        for(int i = 0; i <= index; i++) {
+		        	for(int j = 0; j < changeclass[i].total_city; j++) {
+		        		for(int k = 0; k < changeclass[i].total_city-j-1; k++)
+		        		{
+		        			if(Integer.parseInt(changeclass[i].mark.get(k))
+		        					< Integer.parseInt(changeclass[i].mark.get(k+1))) {
+		        				String tmpcity, tmpmark;
+		        				tmpcity = changeclass[i].city.get(k);
+		        				changeclass[i].city.set(k, changeclass[i].city.get(k+1));
+		        				changeclass[i].city.set(k+1, tmpcity);
+		        				tmpmark = changeclass[i].mark.get(k);
+		        				changeclass[i].mark.set(k, changeclass[i].mark.get(k+1));
+		        				changeclass[i].mark.set(k+1, tmpmark);
+		        			}
+		        			if(Integer.parseInt(changeclass[i].mark.get(k)) 
+		        					== Integer.parseInt(changeclass[i].mark.get(k+1))) {
+		        				if(changeclass[i].city.get(k).compareTo(changeclass[i].city.get(k+1)) > 0) {
+			        				String tmpcity, tmpmark;
+				        			tmpcity = changeclass[i].city.get(k);
+				        			changeclass[i].city.set(k, changeclass[i].city.get(k+1));
+				        			changeclass[i].city.set(k+1, tmpcity);
+				        			tmpmark = changeclass[i].mark.get(k);
+				        			changeclass[i].mark.set(k, changeclass[i].mark.get(k+1));
+				        			changeclass[i].mark.set(k+1, tmpmark);
+		        				}
+		        			}
+		        		}
+		        	}
+		        }
+		        StringBuilder sb = new StringBuilder();
+		        for(int i = 0; i <= index;i++){
+		        	sb.append(changeclass[i].province + " " + changeclass[i].total_mark + "\n");
+		        	for(int j = 0; j < changeclass[i].total_city; j++)
+		        		sb.append(changeclass[i].city.get(j) + " " + changeclass[i].mark.get(j) + "\n");
+		        	sb.append("\n");
+		            }
+		        String s = sb.toString();
+		        fw = new FileWriter("D://softwareprotect//" + yq_out +".txt");
+		        fw.write(s);
+	        }
+		        
+	        else
+	        {
+	        	int marktmp = 0;
+	        	int totalcitytmp = 0;
+	        	ChangeClass exchangeclass = new ChangeClass();
+		        for(int i = 0; i < splitLine.length/3; i++){
+		        	if(name.equals(splitLine[3*i])) {
+		        		exchangeclass.city.add(splitLine[3*i+1]);
+		        		exchangeclass.mark.add(splitLine[3*i+2]);
+		        		totalcitytmp++;
+		        		marktmp += Integer.parseInt(splitLine[3*i+2]);
+		        	}
+		        }
+		        exchangeclass.total_city = totalcitytmp;
+		        exchangeclass.province = name;
+		        exchangeclass.total_mark = marktmp;
+		        for(int i = 0; i < exchangeclass.total_city; i++) {
+		        	for(int j = 0; j < exchangeclass.total_city-i-1; j++) {
+		        		if(Integer.parseInt(exchangeclass.mark.get(j)) 
+		        				< Integer.parseInt(exchangeclass.mark.get(j+1))) {
+		        			String tmpcity, tmpmark;
+		        			tmpcity = exchangeclass.city.get(j);
+		        			exchangeclass.city.set(j, exchangeclass.city.get(j+1));
+		        			exchangeclass.city.set(j+1, tmpcity);
+		        			tmpmark = exchangeclass.mark.get(j);
+		        			exchangeclass.mark.set(j, exchangeclass.mark.get(j+1));
+		        			exchangeclass.mark.set(j+1, tmpmark);
+		        		}
+		        		if(Integer.parseInt(exchangeclass.mark.get(j)) 
+		        				== Integer.parseInt(exchangeclass.mark.get(j+1))) {
+		        			if(exchangeclass.city.get(j).compareTo(exchangeclass.city.get(j+1)) > 0) {
+		        				String tmpcity, tmpmark;
+			        			tmpcity = exchangeclass.city.get(j);
+			        			exchangeclass.city.set(j, exchangeclass.city.get(j+1));
+			        			exchangeclass.city.set(j+1, tmpcity);
+			        			tmpmark = exchangeclass.mark.get(j);
+			        			exchangeclass.mark.set(j, exchangeclass.mark.get(j+1));
+			        			exchangeclass.mark.set(j+1, tmpmark);
+		        			}
+		        		}
+		        	}
+		        }
+		        StringBuilder sb = new StringBuilder();
+		        sb.append(exchangeclass.province + " " + exchangeclass.total_mark + "\n");
+		        for(int i = 0; i < exchangeclass.total_city; i++) {
+		        	sb.append(exchangeclass.city.get(i) + " " + exchangeclass.mark.get(i) + "\n");
+		        }
+		        String s = sb.toString();
+		        fw = new FileWriter("D://softwareprotect//" + yq_out +".txt");
+		        fw.write(s);
+		    }
+    	 } catch (Exception e) {
+		    	e.printStackTrace();
+		    	}finally {
+		    		try {
+		    				fr.close();
+		    				fw.close();
+		    			} catch (Exception e) {
+		            e.printStackTrace();
+		    		}
+		    	}
+	    	in.close();
+		}
+	
+	}
+
+
+import java.util.ArrayList;
+
+/**
+ * 
+ */
+
+/**
+ * @author v
+ *
+ */
+public class ExchangeClass {
+	public String province;
+	public int total_mark;
+	public int total_city;
+	public ArrayList<String> city = new ArrayList<>();
+	public ArrayList<String> mark = new ArrayList<>();
+}
+
+
